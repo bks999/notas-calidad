@@ -1,0 +1,28 @@
+#!/bin/sh
+echo "=========================================="
+echo " PRE-COMMIT HOOK: control de calidad"
+echo "=========================================="
+
+echo "[1/3] Formatter: verificando formato..."
+if ! ./gradlew spotlessCheck --console=plain; then
+  echo "COMMIT RECHAZADO: el codigo no respeta el formato."
+  echo "Solucion: ejecutar ./gradlew spotlessApply y volver a hacer git add."
+  exit 1
+fi
+
+echo "[2/3] Linter: analizando el codigo..."
+if ! ./gradlew checkstyleMain --console=plain; then
+  echo "COMMIT RECHAZADO: el linter encontro problemas."
+  echo "Detalle: build/reports/checkstyle/main.html"
+  exit 1
+fi
+
+echo "[3/3] Pruebas unitarias..."
+if ! ./gradlew test --console=plain; then
+  echo "COMMIT RECHAZADO: hay pruebas que fallan."
+  echo "Detalle: build/reports/tests/test/index.html"
+  exit 1
+fi
+
+echo "OK: los 3 controles pasaron. Commit permitido."
+exit 0
