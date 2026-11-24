@@ -4,24 +4,29 @@ import org.apache.commons.text.WordUtils;
 
 public class CalculadoraNotas {
 
-    public String condicion(String nombre, double p1, double p2, double tp) {
-        String n = WordUtils.capitalizeFully(nombre);
-        if (p1 >= 7 && p2 >= 7) {
-            if (tp >= 7) {
-                return n + ": PROMOCIONADO";
-            } else if (tp >= 4) {
-                return n + ": REGULAR";
-            } else {
-                return n + ": LIBRE";
-            }
-        } else if (p1 >= 4 && p2 >= 4) {
-            if (tp >= 4) {
-                return n + ": REGULAR";
-            } else {
-                return n + ": LIBRE";
-            }
-        } else {
-            return n + ": LIBRE";
+    private static final double NOTA_PROMOCION = 7;
+    private static final double NOTA_APROBACION = 4;
+
+    public String condicion(String nombre, double parcial1, double parcial2, double tp) {
+        return WordUtils.capitalizeFully(nombre) + ": " + calcularCondicion(parcial1, parcial2, tp);
+    }
+
+    private String calcularCondicion(double parcial1, double parcial2, double tp) {
+        if (todasAlMenos(NOTA_PROMOCION, parcial1, parcial2, tp)) {
+            return "PROMOCIONADO";
         }
+        if (todasAlMenos(NOTA_APROBACION, parcial1, parcial2, tp)) {
+            return "REGULAR";
+        }
+        return "LIBRE";
+    }
+
+    private boolean todasAlMenos(double minimo, double... notas) {
+        for (double nota : notas) {
+            if (nota < minimo) {
+                return false;
+            }
+        }
+        return true;
     }
 }
